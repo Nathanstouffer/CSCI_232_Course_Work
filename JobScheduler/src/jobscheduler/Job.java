@@ -17,6 +17,8 @@ public class Job {
     private int duration = 0;
     private int progress = 0;
     private int start_time = 0;
+    private int wait_time = 0;
+    private int execution_time = 0;
     
     /**
      * Constructor method to store values in object
@@ -31,20 +33,26 @@ public class Job {
         arrival_time = p_arrival_time;
         duration = p_duration;
     }
+    
+    /**
+     * Method to calculate wait and execution time for job
+     * @param finish_time
+     */
+    public void calculateStats(int finish_time){
+        wait_time = start_time-arrival_time;
+        execution_time = finish_time-start_time+1;
+    }
 
     /**
-     * Method to print out job information
+     * Method to print out job wait and execution time
      * @param current_second
      * @return 
      */
     public String toString(){
-        String output = String.format("Current job number: "
-                + "%-4d | ", job_number);
-        if (duration == progress){                                      // add to output string if job is completed
-            output += String.format("Completed. Waiting time "
-                    + "(sec): %d | Execution time (sec): ", 
-                    start_time-arrival_time);
-        }
+        String output = String.format("Job number: "
+                + "%-2d | ", job_number);
+        output += String.format("Wait time: %-4d | Execution time:"
+                + " %-4d |", wait_time, execution_time);
         
         return output;
     }
@@ -52,10 +60,15 @@ public class Job {
     /**
      * Method to run job for one second
      */
-    public void runJob(){ progress++; }
+    public void runJob(int current_second){
+        if (start_time == 0){
+            start_time = current_second;
+        }
+        progress++;
+    }
     
     /**
-     * Setter method
+     * Setter methods
      */
     public void setStartTime(int p_start_time) { start_time = p_start_time; }
     
@@ -69,4 +82,6 @@ public class Job {
     public int getDuration() { return duration; }
     public int getProgress() { return progress; }
     public int getStartTime() { return start_time; }
+    public int getWaitTime() { return wait_time; }
+    public int getExectuionTime() { return execution_time; }
 }
