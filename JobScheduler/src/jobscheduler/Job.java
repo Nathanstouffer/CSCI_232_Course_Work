@@ -10,7 +10,7 @@ package jobscheduler;
  * Job objects will be nodes in the heap
  * @author natha
  */
-public class Job {
+public class Job implements Comparable<Job> {
     private int job_number = 0;
     private int priority = 0;
     private int arrival_time = 0;
@@ -42,23 +42,41 @@ public class Job {
         wait_time = start_time-arrival_time;
         execution_time = finish_time-start_time+1;
     }
+    
+    /**
+     * Method to compare object to another object
+     * @param object
+     * @return 
+     */
+    @Override
+    public int compareTo(final Job object){
+        if (this.priority > object.getPriority()){
+            return 1;
+        }
+        else if (this.priority == object.getPriority()){
+            return 0;
+        }
+        else{
+            return -1;
+        }
+    }
 
     /**
      * Method to print out job wait and execution time
-     * @param current_second
      * @return 
      */
+    @Override
     public String toString(){
-        String output = String.format("Job number: "
-                + "%-2d | ", job_number);
-        output += String.format("Wait time: %-4d | Execution time:"
-                + " %-4d |", wait_time, execution_time);
-        
+        String output = String.format("Job number: %-2d | "
+                + "Wait time: %-4d | Execution time: %-4d |",
+                job_number, wait_time, execution_time);
+
         return output;
     }
     
     /**
      * Method to run job for one second
+     * @param current_second
      */
     public void runJob(int current_second){
         if (start_time == 0){
@@ -69,6 +87,7 @@ public class Job {
     
     /**
      * Setter methods
+     * @param p_start_time
      */
     public void setStartTime(int p_start_time) { start_time = p_start_time; }
     

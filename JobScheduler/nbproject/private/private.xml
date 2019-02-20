@@ -2,6 +2,10 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/natha/Documents/CSCI_232/CSCI_232_Course_Work/JobScheduler/src/jobscheduler/JobScheduler.java</file>
+            <file>file:/C:/Users/natha/Documents/CSCI_232/CSCI_232_Course_Work/JobScheduler/src/jobscheduler/JobPriorityQueue.java</file>
+            <file>file:/C:/Users/natha/Documents/CSCI_232/CSCI_232_Course_Work/JobScheduler/src/jobscheduler/Job.java</file>
+        </group>
     </open-files>
 </project-private>

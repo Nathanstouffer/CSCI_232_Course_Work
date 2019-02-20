@@ -47,7 +47,7 @@ public class JobScheduler {
                 }
                 
                 job_data[input_size] = new_job;                                 // insert job obect into array
-                input_size++;                                                   // increase array size
+                input_size++;                                                   // increase data size
             }
             
             quicksort(job_data, 0, input_size-1);                               // sort input by arrival time
@@ -66,7 +66,7 @@ public class JobScheduler {
                 }
 
                 if (!job_heap.isEmpty()){                                                                       // only run output if heap has values
-                    Job current_job = job_heap.peekMax();
+                    Job current_job = (Job) job_heap.peekMax();
 
                     current_job.runJob(current_second);                                                         // run job for one second
                     String output = String.format("Current second: %-4d | "
@@ -76,7 +76,7 @@ public class JobScheduler {
                         output += String.format("\nCompleted job %d", current_job.getJobNumber());
                         current_job.calculateStats(current_second);
                         
-                        job_data[reorder_index] = job_heap.remove();
+                        job_data[reorder_index] = (Job) job_heap.remove();
                         reorder_index++;
                     }
                     System.out.println(output);                                                                 // print job information
