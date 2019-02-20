@@ -11,4 +11,27 @@ package binpacker;
  */
 public class Bin {
     
+    private int[] bin_values;
+    private int value_count;
+    private int bin_weight;
+    
+    /**
+     * Constructor to create bin
+     * @param bin_size 
+     */
+    Bin(int bin_size){
+        bin_values = new int[bin_size];
+    }
+    
+    /**
+     * Method to add value to bin
+     * @param value 
+     */
+    public void addValue(int value){
+        value_count++;
+        bin_values[value_count] = value;
+        bin_weight += value;
+    }
+    
+    public int getBinWeight(){ return bin_weight; }
 }
