@@ -11,27 +11,49 @@ package binpacker;
  */
 public class Bin {
     
-    private int[] bin_values;
-    private int value_count;
-    private int bin_weight;
+    private Bin parent = null;
+    private Bin left = null;
+    private Bin right = null;
+    private int[] items;
+    private int count;
+    private int weight = 0;
     
     /**
      * Constructor to create bin
-     * @param bin_size 
+     * @param size 
      */
-    Bin(int bin_size){
-        bin_values = new int[bin_size];
+    Bin(int max_weight){
+        items = new int[max_weight];
+        count = 0;
     }
     
     /**
-     * Method to add value to bin
-     * @param value 
+     * Method to add value to bin 
+     * @param item
      */
-    public void addValue(int value){
-        value_count++;
-        bin_values[value_count] = value;
-        bin_weight += value;
+    public void addItem(int item){
+        items[count] = item;
+        count++;
+        weight += item;
     }
     
-    public int getBinWeight(){ return bin_weight; }
+    /**
+     * Method to return items array as output
+     * @return 
+     */
+    @Override
+    public String toString(){
+        if (count > 0){
+            String return_string = "{" + items[0];
+            for (int i = 1; i < count; i++){
+                return_string += ", " + items[i];
+            }
+            return return_string + "}";
+        }
+        else{
+            return "No items in bin";
+        }
+    }
+    
+    public int getWeight(){ return weight; }
 }
