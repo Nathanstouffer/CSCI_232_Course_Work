@@ -82,7 +82,7 @@ public class BinPacker {
     }
 
     private static int bestFitDecreasing(int[] items, int max_weight) {
-        
+        return 0;
     }
 
     private static int worstFitDecreasing(int[] items, int max_weight) {

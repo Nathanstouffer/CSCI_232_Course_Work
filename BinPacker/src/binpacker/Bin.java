@@ -9,12 +9,9 @@ package binpacker;
  *
  * @author natha
  */
-public class Bin {
+public class Bin implements Comparable<Bin> {
     
-    private Bin parent = null;
-    private Bin left = null;
-    private Bin right = null;
-    private int[] items;
+    private final int[] items;
     private int count;
     private int weight = 0;
     
@@ -52,6 +49,27 @@ public class Bin {
         }
         else{
             return "No items in bin";
+        }
+    }
+    
+    /**
+     * Method to compare two bins
+     * Returns 1 if current bin has less space than temp
+     * Returns 0 if remaining space is equal
+     * Returns -1 if current bin has more space than temp
+     * @param temp
+     * @return 
+     */
+    @Override
+    public int compareTo(final Bin temp){// throws NullPointerException{
+        if (weight > temp.weight){
+            return 1;
+        }
+        else if (weight == temp.weight){
+            return 0;
+        }
+        else{
+            return -1;
         }
     }
     
