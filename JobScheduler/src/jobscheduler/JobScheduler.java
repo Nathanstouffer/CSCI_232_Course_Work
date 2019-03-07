@@ -25,7 +25,7 @@ public class JobScheduler {
      * Main application and logic go in this method
      */
     public static void start(String input_file_name){
-        Job[] input = new Job[10];                                              // array to store input as Job objects
+        Job[] job_data = new Job[10];                                           // array to store input as Job objects
         int input_size = 0;                                                     // keeps track of the number of values in input[]
         
         System.out.println("Second by second output for a Job Scheduler. "
@@ -41,37 +41,43 @@ public class JobScheduler {
                         Integer.parseInt(line[1]), Integer.parseInt(line[2]),
                         Integer.parseInt(line[3]));                             // convert line to Job object
                 
-                if (input_size == input.length){                                // if array is too short, double the size
+                if (input_size == job_data.length){                             // if array is too short, double the size
                     Job[] new_array = new Job[2*input_size];
-                    input = doubleArraySize(input, new_array);
+                    job_data = doubleArraySize(job_data, new_array);
                 }
                 
-                input[input_size] = new_job;                                    // insert job obect into array
-                input_size++;                                                   // increase array size
+                job_data[input_size] = new_job;                                 // insert job obect into array
+                input_size++;                                                   // increase data size
             }
             
-            quicksort(input, 0, input_size-1);                                  // sort input by arrival time
+            quicksort(job_data, 0, input_size-1);                               // sort input by arrival time
+            
+            System.out.println(String.format("Number of jobs: "
+                    + "%d\n", input_size));
 
             JobPriorityQueue job_heap = new JobPriorityQueue(input_size);       // create job heap
             
             int i = 0;
+            int reorder_index = 0;                                                                              // integer to keep track of index for end of array sorted-by-finsh-time
             for (int current_second = 0; !(job_heap.isEmpty() && i == input_size); current_second++){
-                while (i != input_size && input[i].getArrivalTime() == current_second){                         // insert new job if it has arrived
-                    job_heap.insert(input[i]);
+                while (i != input_size && job_data[i].getArrivalTime() == current_second){                      // insert new job if it has arrived
+                    job_heap.insert(job_data[i]);
                     i++;
                 }
 
                 if (!job_heap.isEmpty()){                                                                       // only run output if heap has values
-                    Job current_job = job_heap.peekMax();
-                    if (current_job.getStartTime() == 0){                                                       // record start time if job has not begun
-                        current_job.setStartTime(current_second);
-                    }
+                    Job current_job = (Job) job_heap.peekMax();
 
-                    current_job.runJob();                                                                       // run job for one second
-                    String output = String.format("Current second: %-4d | " + current_job, current_second);     // begin output string
+                    current_job.runJob(current_second);                                                         // run job for one second
+                    String output = String.format("Current second: %-4d | "
+                            + "Current job number: %-2d |", current_second,
+                            current_job.getJobNumber());
                     if (current_job.getDuration() == current_job.getProgress()){                                // remove job from heap if it is finished
-                        output += String.format("%d", current_second-current_job.getStartTime()+1);
-                        job_heap.remove();
+                        output += String.format("\nCompleted job %d", current_job.getJobNumber());
+                        current_job.calculateStats(current_second);
+                        
+                        job_data[reorder_index] = (Job) job_heap.remove();
+                        reorder_index++;
                     }
                     System.out.println(output);                                                                 // print job information
                 }
@@ -79,6 +85,19 @@ public class JobScheduler {
                     System.out.println(String.format("Current second: %-4d | IDLE", current_second));           // if no value is in queue, print IDLE
                 }
             }
+            
+            int waiting_time_sum = 0, execution_time_sum = 0;
+            System.out.println("\nStatistics:");
+            for (int j = 0; j < input_size; j++){
+                waiting_time_sum += job_data[j].getWaitTime();
+                execution_time_sum += job_data[j].getExectuionTime();
+                System.out.println(job_data[j]);
+            }
+            
+            System.out.println(String.format("\nAverage wait time: %.1f"
+                    + "\nAverage execution time: %.1f", 
+                    ((float)waiting_time_sum)/((float)(input_size)),
+                    ((float)execution_time_sum)/((float)(input_size))));
         }
         catch (FileNotFoundException e){
             System.err.println("Opening file error");

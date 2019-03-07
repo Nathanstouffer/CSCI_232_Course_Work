@@ -10,13 +10,15 @@ package jobscheduler;
  * Job objects will be nodes in the heap
  * @author natha
  */
-public class Job {
+public class Job implements Comparable<Job> {
     private int job_number = 0;
     private int priority = 0;
     private int arrival_time = 0;
     private int duration = 0;
     private int progress = 0;
     private int start_time = 0;
+    private int wait_time = 0;
+    private int execution_time = 0;
     
     /**
      * Constructor method to store values in object
@@ -31,31 +33,61 @@ public class Job {
         arrival_time = p_arrival_time;
         duration = p_duration;
     }
-
+    
     /**
-     * Method to print out job information
-     * @param current_second
+     * Method to calculate wait and execution time for job
+     * @param finish_time
+     */
+    public void calculateStats(int finish_time){
+        wait_time = start_time-arrival_time;
+        execution_time = finish_time-start_time+1;
+    }
+    
+    /**
+     * Method to compare object to another object
+     * @param object
      * @return 
      */
-    public String toString(){
-        String output = String.format("Current job number: "
-                + "%-4d | ", job_number);
-        if (duration == progress){                                      // add to output string if job is completed
-            output += String.format("Completed. Waiting time "
-                    + "(sec): %d | Execution time (sec): ", 
-                    start_time-arrival_time);
+    @Override
+    public int compareTo(final Job object){
+        if (this.priority > object.getPriority()){
+            return 1;
         }
-        
+        else if (this.priority == object.getPriority()){
+            return 0;
+        }
+        else{
+            return -1;
+        }
+    }
+
+    /**
+     * Method to print out job wait and execution time
+     * @return 
+     */
+    @Override
+    public String toString(){
+        String output = String.format("Job number: %-2d | "
+                + "Wait time: %-4d | Execution time: %-4d |",
+                job_number, wait_time, execution_time);
+
         return output;
     }
     
     /**
      * Method to run job for one second
+     * @param current_second
      */
-    public void runJob(){ progress++; }
+    public void runJob(int current_second){
+        if (start_time == 0){
+            start_time = current_second;
+        }
+        progress++;
+    }
     
     /**
-     * Setter method
+     * Setter methods
+     * @param p_start_time
      */
     public void setStartTime(int p_start_time) { start_time = p_start_time; }
     
@@ -69,4 +101,6 @@ public class Job {
     public int getDuration() { return duration; }
     public int getProgress() { return progress; }
     public int getStartTime() { return start_time; }
+    public int getWaitTime() { return wait_time; }
+    public int getExectuionTime() { return execution_time; }
 }
