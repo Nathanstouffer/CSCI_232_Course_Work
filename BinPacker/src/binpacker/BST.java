@@ -359,6 +359,13 @@ public class BST<Key extends Comparable<Key>, Value> {
         }
         return ceiling(root, key).val; 
     }
+    
+    /**
+     * Method to return the value with the largest key
+     * 
+     * @return 
+     */
+    public Value worstFit(){ return this.max(root).val; }
 
     /**
      * Return the key in the symbol table whose rank is {@code k}.
