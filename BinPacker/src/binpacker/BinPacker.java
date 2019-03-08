@@ -35,8 +35,6 @@ public class BinPacker {
         int first_fit_bin_count = firstFit(items, max_weight);
         int best_fit_bin_count = bestFitDecreasing(items, max_weight);
         int worst_fit_bin_count = worstFitDecreasing(items, max_weight);
-        
-        
     }
     
     /**
