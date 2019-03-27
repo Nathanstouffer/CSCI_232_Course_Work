@@ -1,0 +1,25 @@
+c blah blah
+c blah blah
+p sp 10 20
+c asd;lfkj
+c a;d asdf
+a 1 2 4
+a 2 1 3
+a 3 4 5
+a 4 5 6
+a 5 8 3
+a 6 3 1
+a 7 9 9
+a 8 1 7
+a 9 5 8
+a 10 5 8
+a 10 2 5
+a 5 6 4
+a 3 7 2
+a 4 8 4
+a 1 7 5
+a 9 7 3
+a 2 4 8
+a 3 10 4
+a 3 8 6
+a 3 1 9
