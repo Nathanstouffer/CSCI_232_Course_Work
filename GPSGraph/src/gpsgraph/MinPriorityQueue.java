@@ -69,7 +69,7 @@ public class MinPriorityQueue <T extends Comparable<T>> {
         
         // move bottom value to top of heap
         heap[1] = heap[last_item];
-        // variable tells whether heap size has been edited
+        // variable tells whether heap size has been changed
         boolean changed_size = false;
         
         // ensure that every item has either two or zero children
@@ -91,7 +91,7 @@ public class MinPriorityQueue <T extends Comparable<T>> {
             // otherwise, compare priorities
             else{
                 // finds greater priority item of two child items
-                if (compareItems(2*current_index, 2*current_index +1) <= 0){
+                if (compareItems(2*current_index, 2*current_index + 1) <= 0){
                     child_index = 2*current_index;
                 }
                 else{
@@ -113,7 +113,7 @@ public class MinPriorityQueue <T extends Comparable<T>> {
         if (!changed_size){
             heap[last_item] = null;
             last_item--;
-        }    
+        }
         return return_job;
     }
     
@@ -151,7 +151,7 @@ public class MinPriorityQueue <T extends Comparable<T>> {
         
         int child_index = 0;
         // tests which child has greater priority
-        if (compareItems(2*parent_index, 2*parent_index+1) >= 0){
+        if (compareItems(2*parent_index, 2*parent_index+1) <= 0){
             child_index = 2*parent_index;
         }
         else{

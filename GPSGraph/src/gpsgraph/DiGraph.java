@@ -89,7 +89,23 @@ public class DiGraph {
         }
     }
     
+    /**
+     * method to return the cost of a specific edge
+     * @param tail
+     * @param head
+     * @return 
+     */
     public int getEdgeCost(int tail, int head){ return adjacencymtx[tail][head]; }
+    
+    /**
+     * method to return number of vertices in the graph
+     * @return 
+     */
     public int V(){ return this.V; }
+    
+    /**
+     * method to return the number of edges in the graph
+     * @return 
+     */
     public int E(){ return this.E; }
 }

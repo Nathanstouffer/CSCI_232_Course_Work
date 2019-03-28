@@ -8,7 +8,6 @@ package gpsgraph;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
-//import java.util.Iterator;
 
 /**
  *
@@ -20,13 +19,12 @@ public class GPSGraph {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String file_path = "testGraph20.txt";
-        // String file_path = args[0];
+        String file_path = args[0];
         
         // initialize graph from file
         DiGraph graph = createGraph(file_path);
         
-        Path shortest_path = null;
+        int[] shortest_path;
         
         // scanner for user input
         Scanner scan = new Scanner(System.in);
@@ -49,10 +47,12 @@ public class GPSGraph {
                 }
                 else{
                     // find shortest path
+                    long start_time = System.currentTimeMillis();
                     shortest_path = dijkstrasAlg(graph, src, dest);
-                    System.out.println(String.format("\nShortest path from %d to %d", src, dest));
-                    System.out.print(shortest_path);
-                    System.out.println(String.format("Total cost: %d\n", shortest_path.getCost()));
+                    long end_time = System.currentTimeMillis();
+                    double time = (double)(end_time-start_time)/1000;
+                    
+                    output(shortest_path, time);
                 }
             }
             else if (menu_choice != 2){
@@ -62,24 +62,88 @@ public class GPSGraph {
         System.out.println("\nExited.");
     }
     
-    private static Path dijkstrasAlg(DiGraph graph, int src, int dest){        
-        MinPriorityQueue<Path> pq = new MinPriorityQueue<Path>();
-        pq.insert(new Path(src));
+    /**
+     * method to return the revers of the path as an array
+     * @param graph
+     * @param src
+     * @param dest
+     * @return 
+     */
+    private static int[] dijkstrasAlg(DiGraph graph, int src, int dest){
+        // array that stores distance from src for each vertex
+        int[] distTo = new int[graph.V()+1];
+        // array that stores the tail of the edge that connects to the index
+        int[] edgeTo = new int[graph.V()+1];
         
-        while (pq.peek().getTerminal() != dest){
-            // variable to store current shortest existing path
-            Path current = pq.remove();
-            // list of vertexes that the current terminal vertex is connected to
-            Iterable<Integer> heads = graph.adj(current.getTerminal());
+        // populate distTo with values outside scope
+        for (int i = 0; i < distTo.length; i++){
+            distTo[i] = -1;
+        }
+        distTo[src] = 0;
+        edgeTo[src] = -1;
+        
+        MinPriorityQueue<NewVertex> pq = new MinPriorityQueue<NewVertex>();
+        pq.insert(new NewVertex(src, 0));
+        
+        // loop to find the shortest path
+        while (!pq.isEmpty()){
+            // variable to store current shortest path form source
+            NewVertex current = pq.remove();
+            // variable to store list of vertices the terminal vertex of current is connected to
+            Iterable<Integer> heads = graph.adj(current.getVertex());
             
             // loop adds all possible paths branching from the terminal vertex to a min PQ
             for (int head : heads){
-                pq.insert(new Path(current, head, graph.getEdgeCost(current.getTerminal(), head)));
+                int tail = current.getVertex();
+                // variable to store the additional cost of adding an edge from tail to head
+                int edge_dist = graph.getEdgeCost(tail, head);
+                
+                // branch off of current vertex
+                NewVertex branch = relax(distTo, tail, head, edge_dist);
+                if (branch != null){
+                    edgeTo[head] = tail;
+                    pq.insert(branch);
+                }
+                
             }
         }
         
-        // return shortest path from src to dest
-        return pq.remove();
+        // array that stores the path in reverse
+        int[] path = new int[3];
+        path[1] = distTo[dest];
+        // iter follows the shortest path, starting at the dest
+        // i is the first empty index of the path array
+        int iter = dest, i = 2;
+        // loop to insert vertices into path array in reverse order
+        while (iter != -1){
+            if (i == path.length){
+                path = doubleArraySize(path);
+            }
+            path[i] = iter;
+            iter = edgeTo[iter];
+            i++;
+        }
+        // path[0] is the last filled index in the array
+        path[0] = i;
+        return path;
+    }
+    
+    private static NewVertex relax(int[] distTo, int tail, int head, int edge_dist){
+        // if there is no path to head, then this is the current shortest path to head
+        if (distTo[head] == -1){
+            distTo[head] = distTo[tail] + edge_dist;
+            return new NewVertex(head, edge_dist);
+        }
+        // otherwise, if this paths cost is less than the current cost to reach head,
+        // this becomes the current shortest path
+        else if (distTo[head] > distTo[tail] + edge_dist){
+            distTo[head] = distTo[tail] + edge_dist;
+            return new NewVertex(head, edge_dist);
+        }
+        // otherwise, the existing path to head is the shortest path
+        else{
+            return null;
+        }
     }
     
     /**
@@ -160,6 +224,14 @@ public class GPSGraph {
         return new int[] {src, dest};
     }
     
+    private static int[] doubleArraySize(int[] arr){
+        int[] temp = new int[2*arr.length];
+        for (int i = 0; i < arr.length; i++){
+            temp[i] = arr[i];
+        }
+        return temp;
+    }
+    
     /**
      * Method to print menu
      * @param max 
@@ -167,5 +239,30 @@ public class GPSGraph {
     private static void printMenu(int max){
         System.out.println(String.format("The current graph has vertices from 1 to %d.\n"
                 + "Would you like to:\n1. Find a new route\n2. Exit", max));
+    }
+    
+    /**
+     * method to output path information
+     * @param path
+     * @param start
+     * @param end 
+     */
+    private static void output(int[] path, double time){
+        int len = path[0];
+        int cost = path[1];
+        int dest = path[2];
+        int src = path[len-1];                    
+
+        System.out.println(String.format("\nRESULTS\nShortest path from %d to %d", src, dest));
+        String output = "Path: ";
+        for (int i = len - 1; i > 1; i--){
+            output += Integer.toString(path[i]);
+            if (i != 2){
+                output += "->";
+            }
+        }
+        System.out.println(output);
+        System.out.println(String.format("Total cost: %d", cost));
+        System.out.println(String.format("Total time: %.3f sec\n", time));
     }
 }
