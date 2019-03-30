@@ -13,7 +13,7 @@ public class NewVertex implements Comparable<NewVertex>{
     
     // global variables
     private final int vertex;
-    private final int distTo;
+    private int distTo;
     
     /**
      * constructor to initialize global variables
@@ -42,6 +42,9 @@ public class NewVertex implements Comparable<NewVertex>{
             return -1;
         }
     }
+    
+    // setter for distTo
+    public void setDistTo(int dist){ distTo = dist; }
     
     // getter methods
     public int getVertex(){ return vertex; }

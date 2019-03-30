@@ -40,8 +40,8 @@ public class DiGraph {
      * @param head
      * @param weight 
      */
-    public void addEdge(int tail, int head, int weight){
-        adjacencymtx[tail][head] = weight;
+    public void addEdge(int tail, int head, int cost){
+        adjacencymtx[tail][head] = cost;
         E++;
     }
     

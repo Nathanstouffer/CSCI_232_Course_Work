@@ -63,7 +63,7 @@ public class GPSGraph {
     }
     
     /**
-     * method to return the revers of the path as an array
+     * method to return the reverse of the path as an array
      * @param graph
      * @param src
      * @param dest
@@ -102,12 +102,42 @@ public class GPSGraph {
                 NewVertex branch = relax(distTo, tail, head, edge_dist);
                 if (branch != null){
                     edgeTo[head] = tail;
-                    pq.insert(branch);
+                    pq.decreaseKey(branch);
                 }
                 
             }
         }
         
+        return returnShortestPath(distTo, edgeTo, dest);
+    }
+    
+    /**
+     * method to relax edges
+     * @param distTo
+     * @param tail
+     * @param head
+     * @param edge_dist
+     * @return 
+     */
+    private static NewVertex relax(int[] distTo, int tail, int head, int edge_dist){
+        // if there is no path to head, then this is the current shortest path to head
+        if (distTo[head] == -1){
+            distTo[head] = distTo[tail] + edge_dist;
+            return new NewVertex(head, distTo[head]);
+        }
+        // otherwise, if this paths cost is less than the current cost to reach head,
+        // this becomes the current shortest path
+        else if (distTo[head] > distTo[tail] + edge_dist){
+            distTo[head] = distTo[tail] + edge_dist;
+            return new NewVertex(head, distTo[head]);
+        }
+        // otherwise, the existing path to head is the shortest path
+        else{
+            return null;
+        }
+    }
+    
+    private static int[] returnShortestPath(int[] distTo, int[] edgeTo, int dest){
         // array that stores the path in reverse
         int[] path = new int[3];
         path[1] = distTo[dest];
@@ -126,24 +156,6 @@ public class GPSGraph {
         // path[0] is the last filled index in the array
         path[0] = i;
         return path;
-    }
-    
-    private static NewVertex relax(int[] distTo, int tail, int head, int edge_dist){
-        // if there is no path to head, then this is the current shortest path to head
-        if (distTo[head] == -1){
-            distTo[head] = distTo[tail] + edge_dist;
-            return new NewVertex(head, edge_dist);
-        }
-        // otherwise, if this paths cost is less than the current cost to reach head,
-        // this becomes the current shortest path
-        else if (distTo[head] > distTo[tail] + edge_dist){
-            distTo[head] = distTo[tail] + edge_dist;
-            return new NewVertex(head, edge_dist);
-        }
-        // otherwise, the existing path to head is the shortest path
-        else{
-            return null;
-        }
     }
     
     /**
@@ -254,7 +266,7 @@ public class GPSGraph {
         int src = path[len-1];                    
 
         System.out.println(String.format("\nRESULTS\nShortest path from %d to %d", src, dest));
-        String output = "Path: ";
+        String output = "Path:       ";
         for (int i = len - 1; i > 1; i--){
             output += Integer.toString(path[i]);
             if (i != 2){

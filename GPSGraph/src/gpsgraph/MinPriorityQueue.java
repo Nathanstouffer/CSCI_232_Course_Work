@@ -35,28 +35,7 @@ public class MinPriorityQueue <T extends Comparable<T>> {
         // insert new item at end of heap
         heap[last_item] = new_item;
         
-        // variable to track new items location in heap
-        int new_item_index = last_item;
-        boolean sorted = false;
-        
-        // loop to swim new_item up the heap until sorted
-        while (!sorted){
-            // if item is at top, heap is sorted
-            if (new_item_index == 1){
-                sorted = true;
-            }
-            // otherwise, sort by priority
-            else{
-                // if new_item has higher priority than its parent, swim up heap
-                if (compareItems(new_item_index, new_item_index/2) <= 0){
-                    new_item_index = swimUp(new_item_index);                    
-                }
-                // otherwise, heap is sorted3
-                else{
-                    sorted = true;
-                }
-            }
-        }
+        sortUp(last_item);
     }
     
     /**
@@ -69,6 +48,90 @@ public class MinPriorityQueue <T extends Comparable<T>> {
         
         // move bottom value to top of heap
         heap[1] = heap[last_item];
+        
+        sortDown(1);
+        
+        return return_job;
+    }
+    
+    /**
+     * method to change the key of an object if it currently exists in the heap
+     * NOTE: this method is specific to the GPS Graph lab for CSCI 232, delete otherwise
+     * @param object 
+     */
+    public void decreaseKey(T temp){
+        NewVertex object = (NewVertex)temp;
+        boolean not_found = true;
+        for (int i = 1; i <= last_item && not_found; i++){
+            NewVertex current = (NewVertex)heap[i];
+            if (current.getVertex() == object.getVertex()){
+                not_found = false;
+                current.setDistTo(object.getDistTo());
+                //heap[i] = (T)current;
+                sortUp(i);
+            }
+        }
+        if (not_found){
+            insert(temp);
+        }
+    }
+    
+    /**
+     * Method to return top of heap without removing it
+     * @return 
+     */
+    public T peek(){ return heap[1]; }
+    
+    /**
+     * Method to return whether heap is empty
+     * @return 
+     */
+    public boolean isEmpty(){ return heap[1] == null; }
+    
+    /**
+     * method to sort the priority queue going up starting at any index
+     * @param new_item_index 
+     */
+    private void sortUp(int item_index){
+        boolean sorted = false;
+        
+        // loop to swim new_item up the heap until sorted
+        while (!sorted){
+            // if item is at top, heap is sorted
+            if (item_index == 1){
+                sorted = true;
+            }
+            // otherwise, sort by priority
+            else{
+                // if new_item has higher priority than its parent, swim up heap
+                if (compareItems(item_index, item_index/2) <= 0){
+                    item_index = swimUp(item_index);                    
+                }
+                // otherwise, heap is sorted
+                else{
+                    sorted = true;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Method to swim item up if the heap is out of order
+     * @param child_index
+     * @return 
+     */
+    private int swimUp(int child_index){
+        T temp = heap[child_index];
+        heap[child_index] = heap[child_index/2];
+        heap[child_index/2] = temp;
+        return child_index / 2;
+    }
+    
+    /**
+     * method to sort the priority queue going down starting at any index
+     * @param current_index 
+     */
+    private void sortDown(int current_index){
         // variable tells whether heap size has been changed
         boolean changed_size = false;
         
@@ -79,8 +142,6 @@ public class MinPriorityQueue <T extends Comparable<T>> {
             changed_size = true;
         }
         
-        // variable to track location of the item in heap
-        int current_index = 1;
         int child_index;
         boolean sorted = false;
         while (!sorted){
@@ -114,31 +175,6 @@ public class MinPriorityQueue <T extends Comparable<T>> {
             heap[last_item] = null;
             last_item--;
         }
-        return return_job;
-    }
-    
-    /**
-     * Method to return top of heap without removing it
-     * @return 
-     */
-    public T peek(){ return heap[1]; }
-    
-    /**
-     * Method to return whether heap is empty
-     * @return 
-     */
-    public boolean isEmpty(){ return heap[1] == null; }
-    
-    /**
-     * Method to swim item up if the heap is out of order
-     * @param child_index
-     * @return 
-     */
-    private int swimUp(int child_index){
-        T temp = heap[child_index];
-        heap[child_index] = heap[child_index/2];
-        heap[child_index/2] = temp;
-        return child_index / 2;
     }
     
     /**
