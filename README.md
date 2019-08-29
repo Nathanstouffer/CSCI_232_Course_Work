@@ -1,4 +1,4 @@
-# CSCI_232_Course_Work
+# CSCI232
 Course work for CSCI 232 (Data Structures and Algorithms II)
 
 Includes project files for assignments in Data Structures and Algorithms II
