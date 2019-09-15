@@ -15,22 +15,25 @@ import java.util.Scanner;
  */
 public class Dictionary {
     
-    // hashtable to store known words
-    private Hashtable<Integer, String> dict;
-    // ArrayList to store replacement options for a misspelled word
-    private ArrayList<String> options = new ArrayList();
-    // ArrayList to store the depth of an option
-    private ArrayList<Integer> depthOptions = new ArrayList();
-    // ArrayList to help with efficiency, tells if a word has been visited 
-    private ArrayList<String> visited = new ArrayList();
-    // ArrayList to store the depth at which a value was visited
-    private ArrayList<Integer> depthVisited = new ArrayList();
+    // Hashtable to store the dictionary of words
+    private final Hashtable<Integer, String> dict;
+    
+    // ArrayList of replacement options for a misspelled word
+    private final ArrayList<String> options = new ArrayList();
+    // ArrayList of visited words
+    private final ArrayList<String> visited = new ArrayList();
+    
+    // Queue of words to be checked in dict
+    private Queue<String> vals = new Queue();
+    // Queue of depths of words to be checked in dict
+    private Queue<Integer> depths = new Queue();
+    
+    // variable to define the maximum number of options displayed
+    private final int OPTIONS = 7;
     // variable to set maximum distance from current word
     private final int MAXDEPTH = 2;
-    // variable to define the maximum number of options displayed
-    private final int OPTIONS = 6;
     
-    private final char[] alphabet = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+    private final char[] alphabet = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 
         'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
         'w', 'x', 'y', 'z' };
     
@@ -54,135 +57,173 @@ public class Dictionary {
     
     /**
      * method to find and display options for a misspelled word
-     * @param val misspelled word
+     * @param initial misspelled word
      * @return chosen word
      */
-    public String options(String val){
+    public String options(String initial){
         // clear ArrayLists
         options.clear();
-        depthOptions.clear();
         visited.clear();
-        depthVisited.clear();
+        
+        // clear queues
+        vals = new Queue();
+        depths = new Queue();
+        
+        // populate first items in queue
+        vals.enqueue(initial);
+        depths.enqueue(0);
         
         // compute possible options for misspelled word
-        computeOptions(val, 0);
+        computeOptions();
         
-        // sort options by their depth
-        sortByDepth();
         String[] output = new String[OPTIONS];
         // number of values in output
         int count = 0;
-        // get close options for misspelled word
-        for (int i = 0; i < output.length && i < options.size(); i++){
-            if (options.get(i) != null)
+        // populate output array with possible replacements for misspelled words
+        for (int i = 0; count < OPTIONS && i < options.size(); i++){
+            // only add to output array if not null
+            if (options.get(i) != null){
+                output[count] = options.get(i);
                 count++;
-            output[i] = options.get(i);
+            }
         }
         
         // get the choice of the new word from the user
-        String choice = displayOptions(val, output, count);
+        String choice = displayOptions(initial, output, count);
         return choice;
     }
     
     /**
-     * method to find options for a misspelled word
-     * @param val
-     * @param depth 
+     * method to compute possible replacements for misspelled words
      */
-    private void computeOptions(String val, int depth){
-        // check depth of word
-        if (depth <= MAXDEPTH){
-            if (visited.contains(val)){
-                int index = visited.indexOf(val);
-                // return if current depth of val is greater than depth from another path
-                if (depth >= depthVisited.get(index))
-                    return;
-                // otherwise, set the new depth
-                depthVisited.set(index, depth);
-            }
-            else{
-                visited.add(val);
-                depthVisited.add(depth);
-            }
+    private void computeOptions(){  
+        // generate possible replacements for misspelled word
+        while (!vals.isEmpty() && options.size() < OPTIONS){
+            // get next val to be tested
+            String val = vals.dequeue();
+            // get associated depth
+            int depth = depths.dequeue();
             
-            // check to see if val is a word
-            if (!options.contains(val)){
-                if (dict.containsKey(val.hashCode())){
-                    if (dict.containsValue(val)){
-                        options.add(val);
-                        depthOptions.add(depth);
-                    }
+            // if val is in the dictionary, add to ArrayList options
+            if (dict.containsKey(val.hashCode())){
+                if (dict.containsValue(val)){
+                    options.add(val);
                 }
             }
             
-            wrongLetter(val, depth);
-            swapConsecutiveLetters(val, depth);
-            addLetter(val, depth);
-            removeLetter(val, depth);
+            // process word if within MAXDETPH
+            if (depth < MAXDEPTH)
+                processWord(val, depth);
         }
     }
     
     /**
-     * method to switch out every letter in the word
-     * recursive for computing options for misspelled words
+     * method to process a word,
+     * performing each operation on each character in the input string
      * @param val
      * @param depth 
      */
-    private void wrongLetter(String val, int depth){
-        for (int i = 0; i < val.length(); i++){
-            for (int j = 0; j < alphabet.length; j++){
-                String newVal = val.substring(0, i) + alphabet[j] + val.substring(i+1);
-                computeOptions(newVal, depth+1);
-            }
+    private void processWord(String val, int depth){
+        for (int pos = 0; pos < val.length()+1; pos++){
+            addLetter(val, pos, depth+1);
+            removeLetter(val, pos, depth+1);
+            replaceLetter(val, pos, depth+1);
+            swapConsecutiveLetters(val, pos, depth+1);
+            computeOptions();
         }
     }
     
     /**
-     * method to swap two consecutive letters
-     * recursive for computing options for misspelled words
-     * @param val
-     * @param pos
+     * method to process new value as visited and add to the queues
+     * @param newVal
      * @param depth 
      */
-    private void swapConsecutiveLetters(String val, int depth){
-        for (int i = 0; i < val.length()-1; i++){
-            char cur = val.charAt(i);
-            char next = val.charAt(i+1);
-            String newVal = val.substring(0, i) + next + cur + val.substring(i+2);
-            computeOptions(newVal, depth+1);
-        }
+    private void processNewVal(String newVal, int depth){
+        // mark as visited
+        visited.add(newVal);
+        // add newVal to queue
+        vals.enqueue(newVal);
+        // add depth to queue
+        depths.enqueue(depth);
     }
     
     /**
-     * method that adds a letter to a word
-     * recursive for computing options for misspelled words
-     * @param val
-     * @param depth 
+     * Method takes in a word and enqueues modifications to the word.
+     * The modification is adding a single letter to a fixed position in the word.
+     * Every possible modification is enqueued
+     * @param val 
      */
-    private void addLetter(String val, int depth){
-        for (int i = 0; i < val.length()+1; i++){
+    private void addLetter(String val, int pos, int depth){
+        if (pos < val.length()+1){
+            // iterate through the alphabet
             for (int j = 0; j < alphabet.length; j++){
                 String newVal;
-                if (i < val.length())
-                    newVal = val.substring(0, i) + alphabet[j] + val.substring(i);
-                else{
+                if (pos < val.length())
+                    // new string with a letter added inside the word
+                    newVal = val.substring(0, pos) + alphabet[j] + val.substring(pos);
+                else
+                    // new string with a letter added to the end of the word
                     newVal = val + alphabet[j];
-                }
-                computeOptions(newVal, depth+1);
+                // if newVal has not been visited
+                if (!visited.contains(newVal))
+                    processNewVal(newVal, depth);
+            }
+        }
+    }
+
+    /**
+     * Method takes in a word and enqueues modifications to the word.
+     * The modification is removing a single letter at a fixed position in the word.
+     * Every possible modification is enqueued
+     * @param val 
+     */
+    private void removeLetter(String val, int pos, int depth){
+        if (pos < val.length()){
+            // new string missing one letter
+            String newVal = val.substring(0, pos) + val.substring(pos+1);
+            // if newVal has not been visited
+            if (!visited.contains(newVal))
+                processNewVal(newVal, depth);
+        }
+    }
+    
+    /**
+     * Method takes in a word and enqueues modifications to the word.
+     * The modification is replacing a single letter at a fixed position in the word.
+     * Every possible modification is enqueued.
+     * @param val 
+     * @param depth
+     */
+    private void replaceLetter(String val, int pos, int depth){
+        if (pos < val.length()){
+            // iterate through the alphabet
+            for (int j = 0; j < alphabet.length; j++){
+                // new string with replaced letter
+                String newVal = val.substring(0, pos) + alphabet[j] + val.substring(pos+1);
+                // if newVal has not been visited
+                if (!visited.contains(newVal))
+                    processNewVal(newVal, depth);
             }
         }
     }
     
     /**
-     * method to remove a letter from a word
-     * recursive for computing options for misspelled words
-     * @param val
+     * Method takes in a word and enqueues modifications to the word.
+     * The modification is swapping the positions of two consecutive letters at a fixed position
+     * Every possible modification is enqueued
+     * @param val 
      * @param depth 
      */
-    private void removeLetter(String val, int depth){
-        for (int i = 0; i < val.length(); i++){
-            String newVal = val.substring(0, i) + val.substring(i+1);
-            computeOptions(newVal, depth+1);
+    private void swapConsecutiveLetters(String val, int pos, int depth){
+        if (pos < val.length()-1){
+            // char values of letters to be swapped
+            char cur = val.charAt(pos);
+            char next = val.charAt(pos+1);
+            // new string with swapped letters
+            String newVal = val.substring(0, pos) + next + cur + val.substring(pos+2);
+            // if newVal has not been visited
+            if (!visited.contains(newVal))
+                processNewVal(newVal, depth);
         }
     }
     
@@ -221,41 +262,8 @@ public class Dictionary {
                 }
         }
         
+        System.out.println();
         return word;
-    }
-    
-    /**
-     * Method to sort depth and options ArrayLists by the value in depth
-     * Uses bubble sort
-     */
-    private void sortByDepth(){
-        boolean sorted = false;
-        // bubble sort loop
-        while (!sorted){
-            // assume sorted until disproven
-            sorted = true;
-            for (int i = 0; i < depthOptions.size() - 1; i++){
-                // test if swap is needed
-                if (depthOptions.get(i) > depthOptions.get(i+1)){
-                    swapValues(i);                   
-                    sorted = false;
-                }
-            }
-        }
-    }
-    
-    /**
-     * method to swap consecutive values at the indeces "index" and "index+1" in the depth and options ArrayList
-     * @param index 
-     */
-    private void swapValues(int index){
-        // swap values in depth ArrayList
-        depthOptions.add(index, depthOptions.get(index+1));
-        depthOptions.remove(index+2);
-
-        // swap values in options ArrayList
-        options.add(index, options.get(index+1));
-        options.remove(index+2);
     }
     
     public boolean containsKey(Integer key){ return dict.containsKey(key); }

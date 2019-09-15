@@ -24,13 +24,14 @@ public class SpellChecker {
      */
     public static void main(String[] args) {
         try{
-            //String path = args[0];
-            String path = "words.txt";
+            String path = args[0];
+            //String path = "words.txt";
             // dictionary of existing words
+            System.out.println("Loading...");
             Dictionary dict = new Dictionary(getWords(path));
             
-            //path = args[1];
-            path = "mydoc.txt";
+            path = args[1];
+            //path = "mydoc.txt";
             spellCheck(dict, path);
         }
         catch (ArrayIndexOutOfBoundsException e){
@@ -60,12 +61,12 @@ public class SpellChecker {
                 
                 // check if word is in dict
                 // if not, find options
-                if (!checkWord(dict, word)){
+                if (!wordInDict(dict, word)){
+                    System.out.println("Loading...");
                     word = dict.options(word);
                 }
                 
                 output += word + " ";
-                System.out.println();
             }
             
             output += "\n";
@@ -82,7 +83,7 @@ public class SpellChecker {
      * @param word word to be checked
      * @return boolean variable
      */
-    public static boolean checkWord(Dictionary dict, String word){
+    public static boolean wordInDict(Dictionary dict, String word){
         if (dict.containsKey(word.hashCode())){
             if (dict.containsValue(word))
                 return true;
