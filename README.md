@@ -3,6 +3,9 @@ Course work for CSCI 232 (Data Structures and Algorithms II)
 
 Includes project files for assignments in Data Structures and Algorithms II
 
+HOMEWORKS
+
+Homeworks is a directory containing code for homeworks as well as the pdf write ups.
 
 JOB SCHEDULER
 
