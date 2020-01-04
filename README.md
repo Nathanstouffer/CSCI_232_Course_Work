@@ -35,6 +35,6 @@ where V and E are both positive integers. V defines the number of vertices in th
 SPELL CHECKER
 
 Spell Checker is program that takes in an input file with incorrectly spelled words and displays options of correctly spelled words that are 'similar' to the incorrectly spelled word.
-Correctly spelled words come from a seperate input file and are stored in a hash table to allow for efficient access.
-To compute 'similar' words to an incorrectly spelled word, we assume four problems that could cause a word to be misspelled. These are an incorrect letter, swapping of consecutive letters, missing a letter, and an extra letter.
-The algorithm computes all possible solutions to these four problems recursively to a depth no further than three operations from the original word. If the new value is a word, the algorithm will add it to a list of possible words in the order it was discovered. The options are then outputted for the user to change the misspelled words.
+Correctly spelled words come from a seperate input file and are stored in a hash table for efficient access.
+For a given incorrectly spelled word, we assume four possible issues. These are an incorrect letter, swapping of consecutive letters, a missing letter, and an extra letter.
+The algorithm recursively computes all possible combinations of these four problems to a depth no further than three operations from the original word. If the new value is a word, the algorithm will add it to a list of possible words in the order it was discovered. The options are then outputted for the user to choose between.
